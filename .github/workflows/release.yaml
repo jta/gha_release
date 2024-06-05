@@ -26,23 +26,3 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  github-release:
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.release.outputs.release-version }}
-    permissions:
-      contents: write # to be able to publish a GitHub release
-      id-token: write # to enable use of OIDC for npm provenance
-
-    steps:
-    - name: checkout
-      uses: actions/checkout@v4
-
-    - name: cut release
-      id: release
-      uses: ahmadnassri/action-semantic-release@v2
-      with:
-        config: ${{ github.workspace }}/.releaserc.json
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
