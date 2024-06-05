@@ -1,0 +1,27 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    uses: ./.github/workflows/tests.yaml
+    secrets: inherit
+
+  upload:
+    needs: tests
+    uses: ./.github/workflows/upload.yaml
+    secrets: inherit
+    with:
+      s3_bucket_prefix: "observeinc-"
+      global: ${{ github.event_name == 'workflow_dispatch' }}
+
+  integration:
+    needs: upload
+    uses: ./.github/workflows/integration.yaml
+    secrets: inherit
+    with:
+      s3_bucket_prefix: "observeinc-"
+      release_version: ${{ needs.upload.outputs.release_version }}

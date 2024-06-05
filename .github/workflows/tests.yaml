@@ -1,0 +1,15 @@
+name: Run tests
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  go-test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Go unit tests
+      run: make test

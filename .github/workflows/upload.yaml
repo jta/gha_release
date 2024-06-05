@@ -1,0 +1,45 @@
+name: Upload assets 
+
+on:
+  workflow_call:
+    inputs:
+      global:
+        type: boolean
+        description: 'Upload to all supported regions'
+        default: false
+      concurrency:
+        type: number
+        description: 'Number of concurrenct jobs'
+        default: 4 
+      s3_bucket_prefix:
+        type: string
+        description: 'S3 bucket prefix to upload SAM assets to'
+        required: true
+      release_version:
+        type: string
+        description: 'Release version to use. If omitted, version will be computed'
+        default: ''
+    outputs:
+      release_version:
+        description: "Release version used."
+        value: ${{ jobs.upload.outputs.release_version }}
+
+jobs:
+  upload:
+    name: Package and upload SAM apps
+    runs-on: ubuntu-latest
+    outputs:
+      release_version: ${{ steps.build.outputs.version }}
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Build and upload SAM apps
+      id: build
+      run: |
+          make upload
+          echo "version=${RELEASE_VERSION}" >> $GITHUB_OUTPUT
+      env:
+        MAKEFLAGS: "-j ${{ inputs.concurrency }} --output-sync=target"
+        S3_BUCKET_PREFIX: "${{ inputs.s3_bucket_prefix }}"
+        RELEASE_VERSION: "${{ inputs.release_version }}"
