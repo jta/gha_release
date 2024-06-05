@@ -1,6 +1,7 @@
 name: Release
 
 on:
+  push:
   workflow_dispatch:
 
 jobs:
@@ -26,14 +27,15 @@ jobs:
 
   push:
     needs: dryrun
+    if : needs.dryrun.outputs.version != ''
     uses: ./.github/workflows/push.yaml
     secrets: inherit
     with:
       release_version: ${{ needs.dryrun.outputs.version }}
 
   release:
-    needs: push
-    if: needs.push.result == 'success'
+    needs: [dryrun, push]
+    if : needs.dryrun.outputs.version != ''
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.release.outputs.release-version }}
