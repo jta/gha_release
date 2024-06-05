@@ -9,9 +9,16 @@ on:
         type: string
         description: 'Release version to use. If omitted, version will be computed'
         default: ''
+  workflow_dispatch:
+    inputs:
+      run_integration_tests:
+        type: boolean
+        description: 'Run integration tests'
+        default: true
  
 jobs:
   tests:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.run_integration_tests }}
     uses: ./.github/workflows/tests.yaml
     secrets: inherit
 
