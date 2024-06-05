@@ -24,9 +24,16 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  release:
+  push:
     needs: dryrun
-    if: github.event_name == 'workflow_dispatch' && needs.dryrun.result == 'success'
+    uses: ./.github/workflows/push.yaml
+    secrets: inherit
+    with:
+      release_version: ${{ needs.dryrun.outputs.version }}
+
+  release:
+    needs: push
+    if: needs.push.result == 'success'
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.release.outputs.release-version }}
