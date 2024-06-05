@@ -6,6 +6,3 @@ upload:
 
 integration:
 	true
-
-bogus:
-	true
